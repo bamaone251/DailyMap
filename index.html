@@ -10,7 +10,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 10px;
-      background-color: #f8f8f8;
+      background-color: #3ca4ce;
     }
     .container {
       max-width: 600px;
@@ -82,17 +82,11 @@
 </head>
 <body>
   <div class="container">
-    <h1>Task List</h1>
+    <h1>DAILY MAP </h1>
     <table>
       <tr>
         <tr>
-            <td>
-              <input type="checkbox" id="frontend1">
-              <input type="checkbox" id="frontend2">
-              <input type="checkbox" id="frontend3">
-              <input type="checkbox" id="frontend4">
-              <label for="frontend1">FLOORS</label>
-            </td>
+           
           </tr>
           <tr>
             <td>
@@ -101,6 +95,14 @@
               <input type="checkbox" id="produce3">
               <input type="checkbox" id="produce4">
               <label for="produce1">PRODUCE</label>
+            </td>
+
+            <td>
+              <input type="checkbox" id="meat1">
+              <input type="checkbox" id="meat2">
+              <input type="checkbox" id="meat3">
+              <input type="checkbox" id="meat4">
+              <label for="meat1">MEAT</label>
             </td>
           </tr>
     
@@ -113,10 +115,7 @@
               <input type="checkbox" id="PASTRY4">
               <label for="PASTRY1">PASTRY</label>
             </td>
-          </tr>
     
-    
-          <tr>
             <td>
               <input type="checkbox" id="pizza1">
               <input type="checkbox" id="pizza2">
@@ -127,23 +126,30 @@
           </tr>
     
           <tr>
+      
+            
+            
             <td>
-              <input type="checkbox" id="meat1">
-              <input type="checkbox" id="meat2">
-              <input type="checkbox" id="meat3">
-              <input type="checkbox" id="meat4">
-              <label for="meat1">MEAT</label>
+              <input type="checkbox" id="frontend1">
+              <input type="checkbox" id="frontend2">
+              <input type="checkbox" id="frontend3">
+              <input type="checkbox" id="frontend4">
+              <label for="frontend1">FLOORS</label>
             </td>
-          </tr>
-    
-          <tr>
+
+           
+
             <td>
-              <input type="checkbox" id="SAUSAGE1">
-              <input type="checkbox" id="SAUSAGE2">
-              <input type="checkbox" id="SAUSAGE3">
-              <input type="checkbox" id="SAUSAGE4">
-              <label for="SAUSAGE1">SAUSAGE</label>
+              <input type="checkbox" id="BACKROOM1">
+              <input type="checkbox" id="BACKROOM2">
+              <input type="checkbox" id="BACKROOM3">
+              <input type="checkbox" id="BACKROOM4">
+              <label for="BACKROOM1">BACKROOM</label>
             </td>
+
+
+            
+
           </tr>
     </table>
 
@@ -174,12 +180,12 @@
       loadStoredData();
       loadStoredImages();
     });
-
+  
     // Handle Checkboxes
     document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
       checkbox.addEventListener("change", saveCheckboxState);
     });
-
+  
     function saveCheckboxState() {
       let checkboxStates = {};
       document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
@@ -187,28 +193,28 @@
       });
       localStorage.setItem("checkboxes", JSON.stringify(checkboxStates));
     }
-
+  
     function loadStoredData() {
       // Load checkboxes
       let checkboxStates = JSON.parse(localStorage.getItem("checkboxes")) || {};
       document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
         checkbox.checked = checkboxStates[checkbox.id] || false;
       });
-
+  
       // Load Notes and Projects
       document.getElementById("notes").value = localStorage.getItem("notes") || "";
       document.getElementById("projects").value = localStorage.getItem("projects") || "";
-
+  
       // Save Notes and Projects on input
       document.getElementById("notes").addEventListener("input", () => {
         localStorage.setItem("notes", document.getElementById("notes").value);
       });
-
+  
       document.getElementById("projects").addEventListener("input", () => {
         localStorage.setItem("projects", document.getElementById("projects").value);
       });
     }
-
+  
     // Handle Photos
     document.getElementById('cameraInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
@@ -222,24 +228,28 @@
         reader.readAsDataURL(file);
       }
     });
-
+  
     function addImageToGrid(imageData) {
       const img = document.createElement('img');
       img.src = imageData;
       document.getElementById('imageGrid').appendChild(img);
     }
-
+  
     function saveImageToLocal(imageData) {
       let images = JSON.parse(localStorage.getItem('photos')) || [];
       images.push(imageData);
       localStorage.setItem('photos', JSON.stringify(images));
     }
-
+  
     function loadStoredImages() {
       let images = JSON.parse(localStorage.getItem('photos')) || [];
-      images.forEach(addImageToGrid);
+      const imageGrid = document.getElementById('imageGrid');
+      imageGrid.innerHTML = ""; // Clears the grid before adding images
+      images.forEach(imageData => {
+        addImageToGrid(imageData);
+      });
     }
-
+  
     function clearAll() {
       localStorage.clear();
       document.getElementById('imageGrid').innerHTML = '';
@@ -248,5 +258,6 @@
       document.querySelectorAll("input[type='checkbox']").forEach(checkbox => checkbox.checked = false);
     }
   </script>
+  
 </body>
 </html>
