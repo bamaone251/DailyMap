@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task List with Notes and Photos</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: rgb(47, 103, 151);
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .image-grid img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    .button-container {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Task List</h1>
+    <table>
+      <tr>
+        <tr>
+            <td>
+              <input type="checkbox" id="frontend1">
+              <input type="checkbox" id="frontend2">
+              <input type="checkbox" id="frontend3">
+              <input type="checkbox" id="frontend4">
+              <label for="frontend1">FLOORS</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="checkbox" id="produce1">
+              <input type="checkbox" id="produce2">
+              <input type="checkbox" id="produce3">
+              <input type="checkbox" id="produce4">
+              <label for="produce1">PRODUCE</label>
+            </td>
+          </tr>
+    
+    
+          <tr>
+            <td>
+              <input type="checkbox" id="PASTRY1">
+              <input type="checkbox" id="PASTRY2">
+              <input type="checkbox" id="PASTRY3">
+              <input type="checkbox" id="PASTRY4">
+              <label for="PASTRY1">PASTRY</label>
+            </td>
+          </tr>
+    
+    
+          <tr>
+            <td>
+              <input type="checkbox" id="pizza1">
+              <input type="checkbox" id="pizza2">
+              <input type="checkbox" id="pizza3">
+              <input type="checkbox" id="pizza4">
+              <label for="pizza1">PIZZA</label>
+            </td>
+          </tr>
+    
+          <tr>
+            <td>
+              <input type="checkbox" id="meat1">
+              <input type="checkbox" id="meat2">
+              <input type="checkbox" id="meat3">
+              <input type="checkbox" id="meat4">
+              <label for="meat1">MEAT</label>
+            </td>
+          </tr>
+    
+          <tr>
+            <td>
+              <input type="checkbox" id="SAUSAGE1">
+              <input type="checkbox" id="SAUSAGE2">
+              <input type="checkbox" id="SAUSAGE3">
+              <input type="checkbox" id="SAUSAGE4">
+              <label for="SAUSAGE1">SAUSAGE</label>
+            </td>
+          </tr>
+    </table>
+
+    <div class="content">
+      <div class="notes">
+        <h2>Notes</h2>
+        <textarea id="notes" rows="10" cols="50" placeholder="Write your notes here..."></textarea>
+      </div>
+      
+      <div class="projects">
+        <h2>Projects</h2>
+        <textarea id="projects" rows="10" cols="50" placeholder="Write your projects here..."></textarea>
+      </div>
+    </div>
+
+    <!-- Add Pic Section -->
+    <h2>Photos</h2>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+    <div class="button-container">
+      <button onclick="document.getElementById('cameraInput').click()">Add Pic</button>
+      <button onclick="clearAll()">Clear All</button>
+    </div>
+    <div class="image-grid" id="imageGrid"></div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      loadStoredData();
+      loadStoredImages();
+    });
+
+    // Handle Checkboxes
+    document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+      checkbox.addEventListener("change", saveCheckboxState);
+    });
+
+    function saveCheckboxState() {
+      let checkboxStates = {};
+      document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+        checkboxStates[checkbox.id] = checkbox.checked;
+      });
+      localStorage.setItem("checkboxes", JSON.stringify(checkboxStates));
+    }
+
+    function loadStoredData() {
+      // Load checkboxes
+      let checkboxStates = JSON.parse(localStorage.getItem("checkboxes")) || {};
+      document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+        checkbox.checked = checkboxStates[checkbox.id] || false;
+      });
+
+      // Load Notes and Projects
+      document.getElementById("notes").value = localStorage.getItem("notes") || "";
+      document.getElementById("projects").value = localStorage.getItem("projects") || "";
+
+      // Save Notes and Projects on input
+      document.getElementById("notes").addEventListener("input", () => {
+        localStorage.setItem("notes", document.getElementById("notes").value);
+      });
+
+      document.getElementById("projects").addEventListener("input", () => {
+        localStorage.setItem("projects", document.getElementById("projects").value);
+      });
+    }
+
+    // Handle Photos
+    document.getElementById('cameraInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageData = e.target.result;
+          addImageToGrid(imageData);
+          saveImageToLocal(imageData);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function addImageToGrid(imageData) {
+      const img = document.createElement('img');
+      img.src = imageData;
+      document.getElementById('imageGrid').appendChild(img);
+    }
+
+    function saveImageToLocal(imageData) {
+      let images = JSON.parse(localStorage.getItem('photos')) || [];
+      images.push(imageData);
+      localStorage.setItem('photos', JSON.stringify(images));
+    }
+
+    function loadStoredImages() {
+      let images = JSON.parse(localStorage.getItem('photos')) || [];
+      images.forEach(addImageToGrid);
+    }
+
+    function clearAll() {
+      localStorage.clear();
+      document.getElementById('imageGrid').innerHTML = '';
+      document.getElementById('notes').value = '';
+      document.getElementById('projects').value = '';
+      document.querySelectorAll("input[type='checkbox']").forEach(checkbox => checkbox.checked = false);
+    }
+  </script>
+</body>
+</html>
