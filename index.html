@@ -30,7 +30,6 @@
     td {
       padding: 8px;
       font-size: 16px;
-      
     }
     input[type="checkbox"] {
       transform: scale(1.5);
@@ -38,9 +37,10 @@
     }
     textarea {
       width: 100%;
+      height: 20vh;
       box-sizing: border-box;
       padding: 8px;
-      font-size: 4rem;
+      font-size: 2rem;
     }
     .image-grid {
       display: grid;
@@ -68,6 +68,11 @@
       border-radius: 5px;
       cursor: pointer;
       margin: 5px;
+    }
+
+    .label
+    {
+      font-size: 5px;
     }
     button:hover {
       background: #0056b3;
@@ -123,7 +128,7 @@
               <input type="checkbox" id="pizza2">
               <input type="checkbox" id="pizza3">
               <input type="checkbox" id="pizza4">
-              <label for="pizza1">PIZZA</label>
+              <label for="pizza1">   PIZZA</label>
             </td>
           </tr>
     
@@ -155,6 +160,8 @@
           </tr>
     </table>
 
+
+    
     <div class="content">
       <div class="notes">
         <h2>Notes</h2>
@@ -163,9 +170,13 @@
       
       <div class="projects">
         <h2>Projects</h2>
-        <textarea id="projects" rows="6" placeholder=""></textarea>
+        <textarea id="projects" rows="6" placeholder="Write your projects here..."></textarea>
       </div>
     </div>
+
+    <input type="file" id="cameraInput" accept="image/*">
+<div id="imageGrid"></div>
+
 
     <!-- Add Pic Section -->
     <h2>Photos</h2>
@@ -259,7 +270,73 @@
       document.getElementById('projects').value = '';
       document.querySelectorAll("input[type='checkbox']").forEach(checkbox => checkbox.checked = false);
     }
+
+    
   </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
   
+    // 🔥 Replace this with your Firebase config from step 6
+    const firebaseConfig = {
+      apiKey: "AIzaSyAxm7pDeNny0XQsHumG2-pFqCP7YLDZyKw",
+    authDomain: "daily-map-dea58.firebaseapp.com",
+    projectId: "daily-map-dea58",
+    storageBucket: "daily-map-dea58.firebasestorage.app",
+    messagingSenderId: "527422137799",
+    appId: "1:527422137799:web:4a07768f0b3593582525e2",
+    measurementId: "G-9PF8B7QP17"
+  };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+  
+    // ✅ Save Checkbox States
+    document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+      checkbox.addEventListener("change", async () => {
+        let checkboxStates = {};
+        document.querySelectorAll("input[type='checkbox']").forEach(box => {
+          checkboxStates[box.id] = box.checked;
+        });
+        await setDoc(doc(db, "tasklist", "checkboxes"), checkboxStates);
+      });
+    });
+  
+    // ✅ Load Checkboxes from Firestore
+    async function loadCheckboxes() {
+      const docSnap = await getDoc(doc(db, "tasklist", "checkboxes"));
+      if (docSnap.exists()) {
+        const checkboxStates = docSnap.data();
+        document.querySelectorAll("input[type='checkbox']").forEach(box => {
+          box.checked = checkboxStates[box.id] || false;
+        });
+      }
+    }
+  
+    // ✅ Save Notes & Projects
+    async function saveTextData() {
+      await setDoc(doc(db, "tasklist", "notes"), {
+        notes: document.getElementById("notes").value,
+        projects: document.getElementById("projects").value
+      });
+    }
+  
+    // ✅ Load Notes & Projects
+    async function loadTextData() {
+      const docSnap = await getDoc(doc(db, "tasklist", "notes"));
+      if (docSnap.exists()) {
+        document.getElementById("notes").value = docSnap.data().notes || "";
+        document.getElementById("projects").value = docSnap.data().projects || "";
+      }
+    }
+  
+    // ✅ Save on Input
+    document.getElementById("notes").addEventListener("input", saveTextData);
+    document.getElementById("projects").addEventListener("input", saveTextData);
+  
+    // 🔄 Load Data on Start
+    loadCheckboxes();
+    loadTextData();
+  </script>
 </body>
 </html>
